@@ -54,8 +54,8 @@ def option2():
         File1 = ('%s.log' %Previous_Date) # Fichier de le veille
         commands.getoutput('find / -name %s >findme.txt' %File1) # cherche si le fichier de la veille existe
         if os.path.getsize('findme.txt') == 0: # Si le find n'a rien trouvé
-            os.remove('findme.txt') # on supprime de fichier temporaire
-            print("Il n'y a pas de ficheir de scan de la veille.")
+            os.remove('findme.txt') # on supprime le fichier temporaire
+            print("Il n'y a pas de fichier de scan de la veille.")
         else:
             File2 = ('%s.log' %Current_Date) # Fichier d'aujourd'hui
 
