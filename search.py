@@ -12,12 +12,9 @@ import commands
 import commands
 import datetime
 import sys
-# def api():
-	# f=open('api_key.txt','r')
-	# str=f.read()
-	# f.close()
-	# SHODAN_API_KEY=str
-	# api = shodan.Shodan(SHODAN_API_KEY)
+import re
+import operator
+import sqlite3
 
 global adresse_ip
 def clear():
@@ -28,27 +25,6 @@ def option1():
 	#scan( --fields ip_str,port,org --separator , 'File_IP'
 	#Alerte_csv(File_IP)#le nom du fichier est passe en parametre de la fonction, besoin d'un compte premium
 def option2():
-	# def save():
-	# 	save=raw_input("Sauvegarder le(s) résultat(s) ? [O/n]").lower()
-	# 	loop=True
-	# 	while loop:
-	# 		if save.startswith('o') or save=='':
-	# 			os.rename('tmp.log', 'scan_ip.log')
-	# 			clear()
-	# 			print("Sauvegarde réalisée avec succès!")
-	# 			print("Fichier de sauvegarde: scan_ip.log")
-	# 			loop=False
-	# 		elif save.startswith('n'):
-	# 			os.system("rm tmp.log")
-	# 			loop=False
-	# 			main_menu()
-	# 			clear()
-	# 		else:
-	# 			loop=False
-	# 			print("Saisie incorrecte, veuillez respecter les caractères demandés")
-	# 			save()
-	# ~ Alerte_IP()#permet de creer une alerte pour un client et une adresse ip
-    # BOUCLE SCAN EN CONTINUE (TOUS LES 1/4 D'HEURE) ET ALERTE DÈS QU'IL Y A UNE DIFFÉRENCE.
     def compare():
         alerte= ("Alerte::%s.txt" %Current_Date) # Variable qui contient le format de nom pour le fichier d'alerte
         File1 = ('%s.log' %Previous_Date) # Fichier de le veille
@@ -65,16 +41,16 @@ def option2():
             # Tout le contenu devient une string
             old_lines_set = set(old_lines)
             new_lines_set = set(new_lines)
-
+            # Comparaison
             old_added = old_lines_set - new_lines_set
             old_removed = new_lines_set - old_lines_set
 
-            if old_lines_set == new_lines_set:
+            if old_lines_set == new_lines_set: # S'il n'y a pas de changement entre les deux scans
                 print ("")
                 print ("le fichier de la veille être supprimé")
-                commands.getoutput('rm %s' %File1)
+                commands.getoutput('rm %s' %File1) # Suppression du fichier de la veille
 
-            # boucle for pour garder que les éléments qui ont changé
+            # boucle for pour seulement garder les éléments qui ont changé
             sys.stdout=open(alerte,"w") # Toute les sorties qui seront entre cette ligne et sys.stdout.close() seront écrites dans le fichier de la variable alerte
             for line in old_lines:
                 if line in old_added:
@@ -99,7 +75,7 @@ def option2():
         content=commands.getoutput('cat %s.log' %Current_Date)
         print content
         compare()
-        time.sleep(7) # temps d'attente en seconde, 86400s pour 24h
+        time.sleep(86400) # temps d'attente en seconde, 86400s pour 24h
 def option3():
 	#Mettre tout le code de l'option 3
 	print("Option 3 sélectionné\n")
@@ -111,14 +87,14 @@ def changer_api():
 	print ("\n")
 	SHODAN_API_KEY=raw_input("Veuillez indiquer une nouvelle clef API: ")
 	while SHODAN_API_KEY=="":
-		SHODAN_API_KEY=raw_input('\nVeuillez entrer une clef valide: ')
+		SHODAN_API_KEY=raw_input('\nVeuillez entrer une clef valide: ') # Tant qu'on n'a pas entré de clef
 		print ("\n")
-	f=open('api_key.txt','w')
-	f.write(SHODAN_API_KEY)
-	f.close()
+	f=open('api_key.txt','w') # Ouverture ou création du fichier api_key.txt en mode écriture ("w")
+	f.write(SHODAN_API_KEY) # On écrit dans le fichier la clef API
+	f.close() # Puis on ferme le fichier
 	print ("La clé API a bien été remplacée!")
 	print ("\n")
-	api = shodan.Shodan(SHODAN_API_KEY)
+	api = shodan.Shodan(SHODAN_API_KEY) # Et on implémante la clef API avec la commande Shodan
 def sortie():
 	print("A bientôt!!\n")
 def changer_repertoire_api():
@@ -128,27 +104,27 @@ def changer_repertoire_api():
 	    rinit=raw_input("Veuillez indiquer le chemin du fichier api_key.txt: ")
 	    print("\n")
 	    isExist = os.path.exists(rinit)
-	    if isExist==True:
+	    if isExist==True: # Si le chemin du fichier api existe
 	        print("Chemin trouvé!")
 	        print("\n")
 	        rdest=raw_input("Ou voulez-vous déplacer le fichier (indiquer le répertoire sans le nom du fichier AVEC le / à la fin): ")
 	        print("\n")
-	        isExiste = os.path.exists(rdest)
+	        isExiste = os.path.exists(rdest) # Si le chemin de destination existe
 	        if isExiste==True:
 	            print("Répertoire ou chemin trouvé!")
 	            print("\n")
-	            shutil.move(rinit, rdest+'api_key.txt')
-	            if os.path.exists(rdest+'api_key.txt')==True:
+	            shutil.move(rinit, rdest+'api_key.txt') # On déplace le fichier de la clef
+	            if os.path.exists(rdest+'api_key.txt')==True: # Si le fichier a bien été déplacé
 	                print("Le fichier a été déplacé avec succès!")
-	                loop=False
+	                loop=False # On arrete la boucle
 	        else:
-	            print("Répertoire inconnu... Attention aux / et aux accents s'il y en a")
+	            print("Répertoire inconnu... Attention aux / et aux accents s'il y en a") # Affichage d'un message d'erreur
 	            print("\n")
-	            loop=False
+	            loop=False # on arrete la boucle
 	    else:
-	        print("Répertoire inconnu... Attention aux / et aux accents s'il y en a")
+	        print("Répertoire inconnu... Attention aux / et aux accents s'il y en a") # Affichage d'un message d'erreur
 	        print("\n")
-	        loop=False
+	        loop=False # on arrete la boucle
 
 clear()
 print 30 * "-" , "SHODAN AUTOMATIC SCRIPT" , 30 * "-"
@@ -177,11 +153,10 @@ while loop:
 	f.close()
 	SHODAN_API_KEY=str
 	api = shodan.Shodan(SHODAN_API_KEY)
-        ## While loop which will keep going until loop = False
-	main_menu()    ## Displays menu
+	main_menu()    ## afficher le menu
 	choice=int(input("Entrer la valeur correspondant à votre choix [1-6/99]: "))
 	if choice==1:
-		option1()
+		option1() # Appel de la fonction "option1"
 	elif choice==2:
 		option2()
 	elif choice==3:
