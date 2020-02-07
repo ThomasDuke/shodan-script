@@ -12,9 +12,11 @@ import commands
 import re
 import operator
 import sqlite3
+import mysql.connector
 
 # https://www.youtube.com/watch?v=x8i9haDHR0s
 
+mydb = mysql.connector.connect(host="localhost", user="shodan", passwd="mysql")
 filename=('ip_client2.csv')
 fields = []
 rows = []
@@ -41,18 +43,18 @@ class GetData:
                 # print ', '.join(row)
                 for i, cell in enumerate(row):
                     if not len(cell)==0:
-                        if not (re.search(regex, cell)):
-                            # print cell
+                        if (re.search(regex, cell)):
+                            print cell
                             # commands.getoutput('shodan host {cell}'.format(**locals()))
                             # os.system('echo %s >>scan_matrix.log' %scancsv)
                         # if i==1:
                             n=n+1
-                            print "cell[{i}]={cell}".format(**locals())
-                            for i in range(n):
-                                os.chdir('%s/%s' %(path, cell))
-                                pwd=commands.getoutput('pwd')
-                                if pwd == ('%s/%s' %(path, cell)):
-                                    print pwd
+                            # print "cell[{i}]={cell}".format(**locals())
+                            # for i in range(n):
+                            #     os.chdir('%s/%s' %(path, cell))
+                            #     pwd=commands.getoutput('pwd')
+                            #     if pwd == ('%s/%s' %(path, cell)):
+                            #         print pwd
             print n
     def read_matrix_2(self):
         with open(self.path, 'r') as matrix:
@@ -82,79 +84,6 @@ test.read_matrix()
 
 
 
-
-
-
-
-
-
-
-
-
-	# def save():
-	# 	save=raw_input("Sauvegarder le(s) résultat(s) ? [O/n]").lower()
-	# 	loop=True
-	# 	while loop:
-	# 		if save.startswith('o') or save=='':
-	# 			os.rename('tmp.log', 'scan_ip.log')
-	# 			clear()
-	# 			print("Sauvegarde réalisée avec succès!")
-	# 			print("Fichier de sauvegarde: scan_ip.log")
-	# 			loop=False
-	# 		elif save.startswith('n'):
-	# 			os.system("rm tmp.log")
-	# 			loop=False
-	# 			main_menu()
-	# 			clear()
-	# 		else:
-	# 			loop=False
-	# 			print("Saisie incorrecte, veuillez respecter les caractères demandés")
-	# 			save()
-	# ~ Alerte_IP()#permet de creer une alerte pour un client et une adresse ip
-    # BOUCLE SCAN EN CONTINUE (TOUS LES 1/4 D'HEURE) ET ALERTE DÈS QU'IL Y A UNE DIFFÉRENCE.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def readFileIp():
-#     rd = open (ip, "r") # Lecture
-#     while True:
-#         out = rd.readline()
-#         if not out :
-#             break;
-#         # print(out.strip())
-#     rd.close()
-#     return out
-
-
-# def scan():
-#     with open('ip_tmp.log') as f:
-#         lines=f.read().split('\n')
-#         lines.remove('')
-#         print lines
-#         with open('client_tmp.log') as fp:
-#             clients=fp.read().split('\n')
-#             clients.remove('')
-#
-#             #for ip in lines:
-#             files = os.listdir(path)
-#             for name in files:
-#                 commands.getoutput('cd /home/hamsteraimbot/clients/%s && touch %s.log'%(name, lines))
-#
-#                     # commands.getoutput('shodan host %s >> scan_ip_list.log' %ip)
 # def readFileClient():
 #     rd = open (client, "r")
 #     # Read list of lines
