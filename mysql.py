@@ -16,12 +16,22 @@ import MySQLdb
 import pandas as pd
 from sqlalchemy import create_engine
 
+os.system("sudo service mysql start")
+os.system("sudo service postgresql start")
+os.system("sudo service apache2 start")
+
 filename=('ip_client.csv')
+
+# Lecture du fichier CSV
+column_names = ['client', 'ip1', 'ip2', 'ip3', 'ip4', 'ip5', 'ip6', 'ip7', 'ip8', 'ip9', 'ip10']
+df = pd.read_csv(filename, header = None, names = column_names)
+print(df)
+
 
 mydb = MySQLdb.connect(host='localhost',user='shodan',passwd='mysql')
 
 cursor = mydb.cursor()
-cursor.execute("CREATE DATABASE IF NOT EXISTS shodan")
+cursor.execute("CREATE DATABASE IF NOT EXISTS shodan;")
 
 # Fermeture des requettes SQL
 cursor.close()
@@ -32,14 +42,10 @@ mydb.commit()
 # Déconnexion de la bdd
 mydb.close()
 
-# Lecture du fichier CSV
-column_names = ['client', 'ip1', 'ip2', 'ip3', 'ip4', 'ip5', 'ip6', 'ip7', 'ip8', 'ip9', 'ip10']
-df = pd.read_csv(filename, header = None, names = column_names)
-print(df)
-
 # Copie du contenu du CSV dans la BDD
-engine = create_engine('mysql://shodan:mysql@localhost/shodan')
-connection=engine.connect()
-with connection as conn, conn.begin():
-    df.to_sql('csv', conn, if_exists='append', index=False)
-    connection.execute("ALTER TABLE csv ADD Id INT AUTO_INCREMENT PRIMARY KEY")
+engine = create_engine('mysql://shodan:mysql@localhost/shodan') # Connexion dans la bdd shodan
+
+engine.execute("DROP TABLE IF EXISTS csv;") # Supprimer la table csv si elle existe déjà
+df.to_sql('csv', engine, if_exists='append', index=False) # CRéation de la nouvelle table
+engine.execute("ALTER TABLE csv ADD id INT AUTO_INCREMENT PRIMARY KEY") # Incrémentation de la table csv avec les données du fichier csv
+engine.execute("SELECT client FROM `csv` WHERE id=1 ")    # res=connection.fetchall()    # print res

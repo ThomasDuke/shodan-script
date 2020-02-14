@@ -1,0 +1,17 @@
+# Copie du contenu du CSV dans la BDD
+engine = create_engine('mysql://shodan:mysql@localhost/shodan') # Connexion dans la bdd shodan
+# co = MySQLdb.connect(host='localhost',user='shodan',passwd='mysql',database='shodan')
+with engine as conn: # , conn.begin()
+    connection.execute("DROP TABLE IF EXISTS csv;") # Supprimer la table csv si elle existe déjà
+    df.to_sql('csv', conn, if_exists='append', index=False) # CRéation de la nouvelle table
+    connection.execute("ALTER TABLE csv ADD id INT AUTO_INCREMENT PRIMARY KEY") # Incrémentation de la table csv avec les données du fichier csv
+    connection.execute("SELECT client FROM `csv` WHERE id=1 ")    # res=connection.fetchall()    # print res
+
+
+
+
+# Lecture du fichier CSV
+column_names = ['client', 'ip1', 'ip2', 'ip3', 'ip4', 'ip5', 'ip6', 'ip7', 'ip8', 'ip9', 'ip10']
+df = pd.read_csv(filename, header = None, names = column_names)
+print(df)
+
