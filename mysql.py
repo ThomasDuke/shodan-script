@@ -47,5 +47,12 @@ engine = create_engine('mysql://shodan:mysql@localhost/shodan') # Connexion dans
 
 engine.execute("DROP TABLE IF EXISTS csv;") # Supprimer la table csv si elle existe déjà
 df.to_sql('csv', engine, if_exists='append', index=False) # CRéation de la nouvelle table
-engine.execute("ALTER TABLE csv ADD id INT AUTO_INCREMENT PRIMARY KEY") # Incrémentation de la table csv avec les données du fichier csv
-engine.execute("SELECT client FROM `csv` WHERE id=1 ")    # res=connection.fetchall()    # print res
+engine.execute("ALTER TABLE csv ADD id INT AUTO_INCREMENT PRIMARY KEY") # Incrémentation de la table csv
+                                                                        # avec les données du fichier csv
+engine.select([client]).where(csv.columns.id == '1')
+#engine.execute("SELECT client FROM `csv` WHERE id=1")    # res=connection.fetchall()    # print res
+# cursor1=mydb.cursor()
+# cursor1.execute("SELECT id FROM `csv`")
+# result=cursor1.fetchall()
+# for row in result:
+#     print row[0]
